@@ -11,6 +11,7 @@ doctrine:
         naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
         identity_generation_preferences:
             Doctrine\DBAL\Platforms\PostgreSQLPlatform: identity
+        auto_generate_proxy_classes: never
         auto_mapping: true
         mappings:
             App:
@@ -26,20 +27,20 @@ when@test:
     doctrine:
         orm:
             enable_lazy_ghost_objects: true
+            auto_generate_proxy_classes: never
         dbal:
-            # Use SQLite for tests
             url: '%env(resolve:DATABASE_URL)%'
 
 when@prod:
     doctrine:
         orm:
+            auto_generate_proxy_classes: never
             query_cache_driver:
                 type: pool
                 pool: doctrine.system_cache_pool
             result_cache_driver:
                 type: pool
                 pool: doctrine.result_cache_pool
-
     framework:
         cache:
             pools:

@@ -22,4 +22,3 @@ echo "🧹 Clearing cache..."
 php bin/console cache:clear
 
 echo "✅ Setup complete! Visit https://${DDEV_SITENAME}.ddev.site"
-echo "📧 Login with: test@test / password"

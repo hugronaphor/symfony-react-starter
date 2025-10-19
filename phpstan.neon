@@ -1,0 +1,17 @@
+includes:
+    - vendor/phpstan/phpstan-doctrine/extension.neon
+    - vendor/phpstan/phpstan-doctrine/rules.neon
+
+parameters:
+    level: 6
+    doctrine:
+        objectManagerLoader: tests/object-manager.php
+    reportUnmatchedIgnoredErrors: false
+    ignoreErrors:
+        - identifier: missingType.generics
+    paths:
+        - bin/
+        - config/
+        - public/
+        - src/
+        - tests/
