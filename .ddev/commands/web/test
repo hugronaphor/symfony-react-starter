@@ -1,0 +1,8 @@
+#!/bin/bash
+
+## Description: Run all tests and checks
+## Usage: test
+## Example: "ddev test"
+
+echo "Running tests..."
+composer run run-tests

@@ -1,0 +1,30 @@
+security:
+    password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+
+    providers:
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: email
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        main:
+            lazy: true
+            provider: app_user_provider
+            custom_authenticator: App\Security\FormAuthenticator
+            entry_point: App\Security\FormAuthenticator
+            logout:
+                path: app_logout
+                target: app_login
+
+    access_control:
+        # Login page must be accessible to everyone
+        - { path: ^/login$, roles: PUBLIC_ACCESS }
+
+        # Everything else requires authentication
+        - { path: ^/, roles: IS_AUTHENTICATED_FULLY }

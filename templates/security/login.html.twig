@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Log in{% endblock %}
+
+{% block body %}
+    <div class="bg-red-300">@todo: Tailwind css not parsing /templates</div>
+    <div class="min-h-screen flex items-center justify-center bg-gray-950 text-gray-100">
+        <div class="w-full max-w-sm p-8 bg-gray-900 rounded-2xl border border-gray-800 shadow-lg">
+            {% if error %}
+                <div class="bg-red-900/30 border border-red-800 text-red-300 text-sm rounded p-3 mb-4">
+                    {{ error.messageKey|trans(error.messageData, 'security') }}
+                </div>
+            {% endif %}
+
+            {% if app.user %}
+                <div class="mb-4 text-sm text-gray-300">
+                    You are logged in as <strong>{{ app.user.userIdentifier }}</strong>,
+                    <a href="{{ path('app_logout') }}" class="text-blue-400 hover:text-blue-300 underline">Logout</a>
+                </div>
+            {% endif %}
+
+            <h1 class="text-2xl font-bold text-center mb-6">Sign In</h1>
+
+            <form method="post" class="space-y-4">
+                <div>
+                    <label for="inputEmail" class="block text-sm text-gray-400 mb-1">Email</label>
+                    <input
+                        type="email"
+                        value="{{ last_username }}"
+                        name="email"
+                        id="inputEmail"
+                        class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-600"
+                        autocomplete="email"
+                        required
+                        autofocus
+                    >
+                </div>
+
+                <div>
+                    <label for="inputPassword" class="block text-sm text-gray-400 mb-1">Password</label>
+                    <input
+                        type="password"
+                        name="password"
+                        id="inputPassword"
+                        class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-600"
+                        autocomplete="current-password"
+                        required
+                    >
+                </div>
+
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                <button
+                    class="w-full bg-gray-800 hover:bg-gray-700 transition-colors text-gray-100 font-medium py-2 rounded"
+                    type="submit"
+                >
+                    Sign In
+                </button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

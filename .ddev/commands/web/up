@@ -1,0 +1,25 @@
+#!/bin/bash
+
+## Description: Setup the Symfony-React project
+## Usage: up
+## Example: "ddev up"
+
+echo "🚀 Setting up Symfony + React project..."
+
+echo "📦 Installing PHP dependencies..."
+composer install
+
+echo "📦 Installing Node dependencies..."
+npm install
+
+echo "🔨 Building React assets..."
+npm run build
+
+echo "🗄️  Setting up database..."
+php bin/console doctrine:schema:update --force
+
+echo "🧹 Clearing cache..."
+php bin/console cache:clear
+
+echo "✅ Setup complete! Visit https://${DDEV_SITENAME}.ddev.site"
+echo "📧 Login with: test@test / password"
