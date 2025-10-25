@@ -112,4 +112,115 @@ class FormAuthenticatorTest extends TestCase
 
         $this->assertSame($loginUrl, $result);
     }
+
+    public function testAuthenticateWithEmptyEmail(): void
+    {
+        $session = new Session(new MockArraySessionStorage());
+
+        $request = Request::create('/login', 'POST', [], [], [], [], json_encode([
+            'email' => '',
+            'password' => 'password123',
+            '_csrf_token' => 'csrf_token_value',
+        ]));
+        $request->setSession($session);
+        $request->headers->set('Content-Type', 'application/json');
+
+        $passport = $this->authenticator->authenticate($request);
+
+        $userBadge = $passport->getBadge(UserBadge::class);
+        $this->assertSame('', $userBadge->getUserIdentifier());
+    }
+
+    public function testAuthenticateWithEmptyPassword(): void
+    {
+        $session = new Session(new MockArraySessionStorage());
+
+        $request = Request::create('/login', 'POST', [], [], [], [], json_encode([
+            'email' => 'test@example.com',
+            'password' => '',
+            '_csrf_token' => 'csrf_token_value',
+        ]));
+        $request->setSession($session);
+        $request->headers->set('Content-Type', 'application/json');
+
+        $passport = $this->authenticator->authenticate($request);
+
+        $credentials = $passport->getBadge(PasswordCredentials::class);
+        $this->assertInstanceOf(PasswordCredentials::class, $credentials);
+    }
+
+    public function testAuthenticateStoresLastUsernameInSession(): void
+    {
+        $email = 'test@example.com';
+        $session = new Session(new MockArraySessionStorage());
+
+        $request = Request::create('/login', 'POST', [], [], [], [], json_encode([
+            'email' => $email,
+            'password' => 'password123',
+            '_csrf_token' => 'csrf_token_value',
+        ]));
+        $request->setSession($session);
+        $request->headers->set('Content-Type', 'application/json');
+
+        $this->authenticator->authenticate($request);
+
+        $this->assertSame($email, $session->get(SecurityRequestAttributes::LAST_USERNAME));
+    }
+
+    public function testAuthenticateWithWhitespaceInEmail(): void
+    {
+        $email = '  test@example.com  ';
+        $session = new Session(new MockArraySessionStorage());
+
+        $request = Request::create('/login', 'POST', [], [], [], [], json_encode([
+            'email' => $email,
+            'password' => 'password123',
+            '_csrf_token' => 'csrf_token_value',
+        ]));
+        $request->setSession($session);
+        $request->headers->set('Content-Type', 'application/json');
+
+        $passport = $this->authenticator->authenticate($request);
+
+        $userBadge = $passport->getBadge(UserBadge::class);
+        $this->assertSame($email, $userBadge->getUserIdentifier());
+    }
+
+    public function testAuthenticateWithLongEmail(): void
+    {
+        $email = str_repeat('a', 170).'@example.com';
+        $session = new Session(new MockArraySessionStorage());
+
+        $request = Request::create('/login', 'POST', [], [], [], [], json_encode([
+            'email' => $email,
+            'password' => 'password123',
+            '_csrf_token' => 'csrf_token_value',
+        ]));
+        $request->setSession($session);
+        $request->headers->set('Content-Type', 'application/json');
+
+        $passport = $this->authenticator->authenticate($request);
+
+        $userBadge = $passport->getBadge(UserBadge::class);
+        $this->assertSame($email, $userBadge->getUserIdentifier());
+    }
+
+    public function testAuthenticateWithSpecialCharactersInPassword(): void
+    {
+        $password = '!@#$%^&*()_+-=[]{}|;\':",./<>?';
+        $session = new Session(new MockArraySessionStorage());
+
+        $request = Request::create('/login', 'POST', [], [], [], [], json_encode([
+            'email' => 'test@example.com',
+            'password' => $password,
+            '_csrf_token' => 'csrf_token_value',
+        ]));
+        $request->setSession($session);
+        $request->headers->set('Content-Type', 'application/json');
+
+        $passport = $this->authenticator->authenticate($request);
+
+        $credentials = $passport->getBadge(PasswordCredentials::class);
+        $this->assertInstanceOf(PasswordCredentials::class, $credentials);
+    }
 }

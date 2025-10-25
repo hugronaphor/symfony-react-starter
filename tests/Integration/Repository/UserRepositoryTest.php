@@ -86,4 +86,94 @@ class UserRepositoryTest extends AuthenticatedTestCase
         $randomUser = $this->repository->findOneBy(['email' => 'random@example.com']);
         $this->assertNull($randomUser);
     }
+
+    public function testUpgradePasswordUpdatesPasswordInDatabase(): void
+    {
+        $oldPassword = $this->authenticatedUser->getPassword();
+        $newHashedPassword = 'new_hashed_password_123';
+
+        $this->repository->upgradePassword($this->authenticatedUser, $newHashedPassword);
+
+        $this->entityManager->clear();
+
+        $updatedUser = $this->repository->findOneBy(['email' => $this->authenticatedUser->getEmail()]);
+
+        $this->assertNotNull($updatedUser);
+        $this->assertSame($newHashedPassword, $updatedUser->getPassword());
+        $this->assertNotSame($oldPassword, $updatedUser->getPassword());
+    }
+
+    public function testUpgradePasswordPersistsChanges(): void
+    {
+        $newHashedPassword = 'another_new_password_456';
+
+        $this->repository->upgradePassword($this->authenticatedUser, $newHashedPassword);
+
+        $this->entityManager->clear();
+
+        $reloadedUser = $this->repository->find($this->authenticatedUser->getId());
+
+        $this->assertNotNull($reloadedUser);
+        $this->assertSame($newHashedPassword, $reloadedUser->getPassword());
+    }
+
+    public function testFindByEmailWithSpecialCharacters(): void
+    {
+        $specialEmail = 'test+special@example.com';
+
+        $user = new User();
+        $user->setEmail($specialEmail);
+        $passwordHasher = $this->passwordHasherFactory->getPasswordHasher(User::class);
+        $user->setPassword($passwordHasher->hash('password123'));
+        $user->setRoles(['ROLE_USER']);
+
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
+        $foundUser = $this->repository->findOneBy(['email' => $specialEmail]);
+
+        $this->assertNotNull($foundUser);
+        $this->assertSame($specialEmail, $foundUser->getEmail());
+    }
+
+    public function testFindByEmailWithUppercaseCharacters(): void
+    {
+        $email = 'Test@Example.COM';
+
+        $user = new User();
+        $user->setEmail($email);
+        $passwordHasher = $this->passwordHasherFactory->getPasswordHasher(User::class);
+        $user->setPassword($passwordHasher->hash('password123'));
+        $user->setRoles(['ROLE_USER']);
+
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
+        $foundUser = $this->repository->findOneBy(['email' => $email]);
+
+        $this->assertNotNull($foundUser);
+        $this->assertSame($email, $foundUser->getEmail());
+    }
+
+    public function testFindByEmailIsCaseSensitive(): void
+    {
+        $email = 'Test@Example.com';
+
+        $user = new User();
+        $user->setEmail($email);
+        $passwordHasher = $this->passwordHasherFactory->getPasswordHasher(User::class);
+        $user->setPassword($passwordHasher->hash('password123'));
+        $user->setRoles(['ROLE_USER']);
+
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
+        $foundUser = $this->repository->findOneBy(['email' => 'test@example.com']);
+
+        $this->assertNull($foundUser);
+
+        $correctUser = $this->repository->findOneBy(['email' => $email]);
+
+        $this->assertNotNull($correctUser);
+    }
 }
