@@ -1,0 +1,8 @@
+#!/bin/bash
+
+## Description: Run phpstan
+## Usage: phpstan
+## Example: "ddev phpstan"
+
+echo "Running phpstan..."
+composer run run-phpstan
