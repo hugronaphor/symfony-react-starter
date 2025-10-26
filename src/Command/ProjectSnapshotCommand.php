@@ -16,11 +16,6 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  * ProjectSnapshotCommand.
  *
  * This command generates a comprehensive snapshot of this project's source files.
- *
- * **Usage:**
- * php bin/console app:project-snapshot
- * php bin/console app:project-snapshot --format text
- * php bin/console app:project-snapshot --output custom-snapshot.md
  */
 #[AsCommand(
     name: 'app:project-snapshot',

@@ -5,5 +5,4 @@
 ## Example: "ddev test"
 
 echo "Running unit tests..."
-#composer run run-phpunit
 ./vendor/bin/phpunit tests -v
