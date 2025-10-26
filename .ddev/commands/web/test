@@ -4,5 +4,6 @@
 ## Usage: test
 ## Example: "ddev test"
 
-echo "Running tests..."
-composer run run-tests
+echo "Running unit tests..."
+#composer run run-phpunit
+./vendor/bin/phpunit tests -v

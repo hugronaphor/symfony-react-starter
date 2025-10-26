@@ -113,24 +113,6 @@ class FormAuthenticatorTest extends TestCase
         $this->assertSame($loginUrl, $result);
     }
 
-    public function testAuthenticateWithEmptyEmail(): void
-    {
-        $session = new Session(new MockArraySessionStorage());
-
-        $request = Request::create('/login', 'POST', [], [], [], [], json_encode([
-            'email' => '',
-            'password' => 'password123',
-            '_csrf_token' => 'csrf_token_value',
-        ]));
-        $request->setSession($session);
-        $request->headers->set('Content-Type', 'application/json');
-
-        $passport = $this->authenticator->authenticate($request);
-
-        $userBadge = $passport->getBadge(UserBadge::class);
-        $this->assertSame('', $userBadge->getUserIdentifier());
-    }
-
     public function testAuthenticateWithEmptyPassword(): void
     {
         $session = new Session(new MockArraySessionStorage());

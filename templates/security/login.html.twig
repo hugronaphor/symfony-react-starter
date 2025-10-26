@@ -4,10 +4,16 @@
 
 {% block body %}
     <div class="bg-red-300">@todo: Tailwind css not parsing /templates</div>
-    <div class="min-h-screen flex items-center justify-center bg-gray-950 text-gray-100">
+    <div class="flex items-center justify-center min-h-screen bg-gray-950 text-gray-100">
         <div class="w-full max-w-sm p-8 bg-gray-900 rounded-2xl border border-gray-800 shadow-lg">
+            {% for message in app.flashes('error') %}
+                <div class="bg-red-900/30 border border-red-800 text-red-300 text-sm rounded p-3 mb-4" data-test="error-message">
+                    {{ message }}
+                </div>
+            {% endfor %}
+
             {% if error %}
-                <div class="bg-red-900/30 border border-red-800 text-red-300 text-sm rounded p-3 mb-4">
+                <div class="bg-red-900/30 border border-red-800 text-red-300 text-sm rounded p-3 mb-4" data-test="error-message">
                     {{ error.messageKey|trans(error.messageData, 'security') }}
                 </div>
             {% endif %}
